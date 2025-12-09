@@ -2,7 +2,7 @@
 
 namespace DummyNamespace;
 
-use Laratrust\Models\Team as LaratrustTeam;
+use Laratrust\Models\LaratrustTeam;
 
 class DummyClass extends LaratrustTeam
 {

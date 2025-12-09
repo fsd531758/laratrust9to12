@@ -13,14 +13,14 @@ use Laratrust\Checkers\CheckersManager;
 use Laratrust\Checkers\Role\RoleChecker;
 use Laratrust\Contracts\Role as RoleContract;
 use Laratrust\Helper;
-use Laratrust\Traits\DynamicUserRelationshipCalls;
-use Laratrust\Traits\HasLaratrustEvents;
+use Laratrust\Traits\LaratrustDynamicUserRelationsCalls;
+use Laratrust\Traits\LaratrustHasEvents;
 use Ramsey\Uuid\UuidInterface;
 
 class Role extends Model implements RoleContract
 {
-    use HasLaratrustEvents;
-    use DynamicUserRelationshipCalls;
+    use LaratrustHasEvents;
+    use LaratrustDynamicUserRelationsCalls;
 
     /**
      * The database table used by the model.
@@ -104,11 +104,6 @@ class Role extends Model implements RoleContract
     {
         return $this->laratrustRoleChecker()
             ->currentRoleHasPermission($permission, $requireAll);
-    }
-
-    public function doesntHavePermission(string|array|BackedEnum $permission, bool $requireAll = false): bool
-    {
-        return ! $this->hasPermission($permission, $requireAll);
     }
 
     public function syncPermissions(iterable $permissions): static

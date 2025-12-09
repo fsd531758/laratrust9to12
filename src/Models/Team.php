@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Support\Facades\Config;
 use Laratrust\Contracts\Team as TeamContract;
-use Laratrust\Traits\DynamicUserRelationshipCalls;
+use Laratrust\Traits\LaratrustDynamicUserRelationsCalls;
 
 class Team extends Model implements TeamContract
 {
-    use DynamicUserRelationshipCalls;
+    use LaratrustDynamicUserRelationsCalls;
 
     /**
      * The database table used by the model.

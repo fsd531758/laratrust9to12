@@ -2,11 +2,11 @@
 
 namespace Laratrust\Http\Controllers;
 
+use Laratrust\Helper;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\View;
-use Laratrust\Helper;
 
 class RolesAssignmentController
 {
@@ -27,7 +27,7 @@ class RolesAssignmentController
         $modelKey = $request->get('model') ?? $modelsKeys[0] ?? null;
         $userModel = Config::get('laratrust.user_models')[$modelKey] ?? null;
 
-        if (! $userModel) {
+        if (!$userModel) {
             abort(404);
         }
 
@@ -45,9 +45,8 @@ class RolesAssignmentController
         $modelKey = $request->get('model');
         $userModel = Config::get('laratrust.user_models')[$modelKey] ?? null;
 
-        if (! $userModel) {
+        if (!$userModel) {
             Session::flash('laratrust-error', 'Model was not specified in the request');
-
             return redirect(route('laratrust.roles-assignment.index'));
         }
 
@@ -76,6 +75,7 @@ class RolesAssignmentController
                 });
         }
 
+
         return View::make('laratrust::panel.roles-assignment.edit', [
             'modelKey' => $modelKey,
             'roles' => $roles,
@@ -89,9 +89,8 @@ class RolesAssignmentController
         $modelKey = $request->get('model');
         $userModel = Config::get('laratrust.user_models')[$modelKey] ?? null;
 
-        if (! $userModel) {
+        if (!$userModel) {
             Session::flash('laratrust-error', 'Model was not specified in the request');
-
             return redirect()->back();
         }
 
@@ -102,7 +101,6 @@ class RolesAssignmentController
         }
 
         Session::flash('laratrust-success', 'Roles and permissions assigned successfully');
-
         return redirect(route('laratrust.roles-assignment.index', ['model' => $modelKey]));
     }
 }

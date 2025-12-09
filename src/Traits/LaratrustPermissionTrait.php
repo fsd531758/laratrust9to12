@@ -1,46 +1,30 @@
 <?php
 
-declare(strict_types=1);
+namespace Laratrust\Traits;
 
-namespace Laratrust\Models;
-
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Support\Facades\Config;
-use Laratrust\Contracts\Permission as PermissionContract;
-use Laratrust\Traits\LaratrustDynamicUserRelationsCalls;
 
-class Permission extends Model implements PermissionContract
+trait LaratrustPermissionTrait
 {
     use LaratrustDynamicUserRelationsCalls;
 
     /**
-     * The database table used by the model.
+     * Boots the permission model and attaches event listener to
+     * remove the many-to-many records when trying to delete.
+     * Will NOT delete any records if the permission model uses soft deletes.
      *
-     * @var string
+     * @return void|bool
      */
-    protected $table;
-
-    protected $fillable = [
-        'name',
-        'display_name',
-        'description',
-    ];
-
-    /**
-     * Creates a new instance of the model.
-     */
-    public function __construct(array $attributes = [])
-    {
-        parent::__construct($attributes);
-        $this->table = Config::get('laratrust.tables.permissions');
-    }
-
-    protected static function booted(): void
+    public static function bootLaratrustPermissionTrait()
     {
         static::deleting(function ($permission) {
-            if (method_exists($permission, 'bootSoftDeletes') && ! $permission->forceDeleting) {
+            if (!method_exists(Config::get('laratrust.models.permission'), 'bootSoftDeletes')) {
+                $permission->roles()->sync([]);
+            }
+        });
+
+        static::deleting(function ($permission) {
+            if (method_exists($permission, 'bootSoftDeletes') && !$permission->forceDeleting) {
                 return;
             }
 
@@ -54,8 +38,10 @@ class Permission extends Model implements PermissionContract
 
     /**
      * Many-to-Many relations with role model.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    public function roles(): BelongsToMany
+    public function roles()
     {
         return $this->belongsToMany(
             Config::get('laratrust.models.role'),
@@ -67,8 +53,11 @@ class Permission extends Model implements PermissionContract
 
     /**
      * Morph by Many relationship between the permission and the one of the possible user models.
+     *
+     * @param  string  $relationship
+     * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
      */
-    public function getMorphByUserRelation(string $relationship): MorphToMany
+    public function getMorphByUserRelation($relationship)
     {
         return $this->morphedByMany(
             Config::get('laratrust.user_models')[$relationship],
